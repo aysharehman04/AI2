@@ -16,6 +16,7 @@ class Agent:
     
     def move(self, state, mode):
         pass
+    
 
     
     
