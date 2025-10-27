@@ -19,8 +19,7 @@ class Agent:
         return state.numHingers == 1
     
 
-    
-        
+
     def is_terminal(self, state):
         #need section for checking if there is a win
         if self.win(state):
