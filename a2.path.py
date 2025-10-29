@@ -36,49 +36,62 @@ def IsSafe(state):
     return state.numHingers() == 0
 
 
-def MoveCostBetween(s1, s2):
-    """Find which cell changed and return the move cost."""
-    for r in range(s1.rows):
-        for c in range(s1.cols):
-            if s1.grid[r][c] - s2.grid[r][c] == 1:
-                return s1.move_cost(r, c)
-    return 0
+def ApplyMoves(start, moves):
+    """Apply a sequence of moves to get the final state."""
+    Current = start
+    for move in moves:
+        r, c = move
+        NewGrid = [row[:] for row in Current.grid]
+        NewGrid[r][c] -= 1
+        Current = State(NewGrid)
+    return Current
 
 
-def PathCost(path):
-    """Compute total cost along a path."""
-    total = 0
-    for i in range(len(path) - 1):
-        total += MoveCostBetween(path[i], path[i + 1])
-    return total
+def MoveCost(state, move):
+    """Get the cost of a move at position (r, c)."""
+    r, c = move
+    return state.move_cost(r, c)
+
+
+def PathCost(start, moves):
+    """Compute total cost of a path."""
+    Total = 0
+    Current = start
+    for move in moves:
+        Total += MoveCost(Current, move)
+        r, c = move
+        NewGrid = [row[:] for row in Current.grid]
+        NewGrid[r][c] -= 1
+        Current = State(NewGrid)
+    return Total
 
 
 # =====================================================
 # Breadth-First Search
 # =====================================================
 def path_BFS(start, end):
-    """Breadth-First Search to find a safe path between start and end."""
+    """BFS to find a safe path."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
-        return [start]
+        return []
 
-    frontier = [(start, [start])]
-    visited = {GridToKey(start.grid)}
+    Frontier = [(start, [])]
+    Visited = {GridToKey(start.grid)}
 
-    while frontier:
-        current, path = frontier.pop(0)
-        for NextState, pos, cost in current.moves():
-            key = GridToKey(NextState.grid)
-            if key in visited:
+    while Frontier:
+        Current, Moves = Frontier.pop(0)
+        for NextState, pos, cost in Current.moves():
+            Key = GridToKey(NextState.grid)
+            if Key in Visited:
                 continue
             if not IsSafe(NextState):
                 continue
-            visited.add(key)
-            NewPath = path + [NextState]
+            Visited.add(Key)
+            NewMoves = Moves + [pos]
             if StatesEqual(NextState, end):
-                return NewPath
-            frontier.append((NextState, NewPath))
+                return NewMoves
+            Frontier.append((NextState, NewMoves))
     return None
 
 
@@ -86,68 +99,68 @@ def path_BFS(start, end):
 # Depth-First Search
 # =====================================================
 def path_DFS(start, end, limit=10000):
-    """Depth-First Search using a stack."""
+    """DFS using a stack."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
-        return [start]
+        return []
 
-    stack = [(start, [start])]
-    visited = {GridToKey(start.grid)}
+    Stack = [(start, [])]
+    Visited = {GridToKey(start.grid)}
 
-    steps = 0
-    while stack:
-        current, path = stack.pop()
-        steps += 1
-        if steps > limit:
+    Steps = 0
+    while Stack:
+        Current, Moves = Stack.pop()
+        Steps += 1
+        if Steps > limit:
             return None
-        for NextState, pos, cost in current.moves():
-            key = GridToKey(NextState.grid)
-            if key in visited:
+        for NextState, pos, cost in Current.moves():
+            Key = GridToKey(NextState.grid)
+            if Key in Visited:
                 continue
             if not IsSafe(NextState):
                 continue
-            visited.add(key)
-            NewPath = path + [NextState]
+            Visited.add(Key)
+            NewMoves = Moves + [pos]
             if StatesEqual(NextState, end):
-                return NewPath
-            stack.append((NextState, NewPath))
+                return NewMoves
+            Stack.append((NextState, NewMoves))
     return None
 
 
 # =====================================================
 # Iterative Deepening DFS
 # =====================================================
-def limited_dfs(current, end, depth, visited):
-    """Recursive helper for depth-limited search."""
-    if StatesEqual(current, end):
-        return [current]
+def limited_dfs(Current, end, depth, Visited, Moves):
+    """Helper for depth-limited search."""
+    if StatesEqual(Current, end):
+        return Moves
     if depth == 0:
         return None
-    for NextState, pos, cost in current.moves():
-        key = GridToKey(NextState.grid)
-        if key in visited or not IsSafe(NextState):
+    for NextState, pos, cost in Current.moves():
+        Key = GridToKey(NextState.grid)
+        if Key in Visited or not IsSafe(NextState):
             continue
-        visited.add(key)
-        result = limited_dfs(NextState, end, depth - 1, visited)
-        visited.remove(key)
-        if result:
-            return [current] + result
+        Visited.add(Key)
+        Result = limited_dfs(NextState, end, depth - 1, Visited, Moves + [pos])
+        Visited.remove(Key)
+        if Result is not None:
+            return Result
     return None
 
 
 def path_IDDFS(start, end, MaxDepth=50):
-    """Iterative Deepening DFS."""
+    """Iterative deepening DFS."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
-        return [start]
+        return []
 
     for depth in range(1, MaxDepth + 1):
-        visited = {GridToKey(start.grid)}
-        result = limited_dfs(start, end, depth, visited)
-        if result:
-            return result
+        Visited = {GridToKey(start.grid)}
+        Result = limited_dfs(start, end, depth, Visited, [])
+        if Result is not None:
+            return Result
     return None
 
 
@@ -156,84 +169,78 @@ def path_IDDFS(start, end, MaxDepth=50):
 # =====================================================
 def manhattan_heuristic(start, end):
     """
-    Manhattan-style heuristic for A* search.
-
-    Basically pairs up the active cells in start and end states (sorted by position)
-    and calculates Manhattan distance between them. Also adds a penalty for any
-    difference in the number of active cells.
-
-    This is admissible because Manhattan distance never overestimates - each counter
-    needs to be removed at least once, and we're not even accounting for the cost of
-    adjacent cells, just the base cost of 1 per move.
+    Heuristic for A*.
+    Pairs up active cells and calculates Manhattan distance between them.
+    Admissible because it never overestimates the actual cost.
     """
-    s1 = []
-    s2 = []
+    S1 = []
+    S2 = []
     for r in range(start.rows):
         for c in range(start.cols):
             if start.grid[r][c] >= 1:
-                s1.append((r, c))
+                S1.append((r, c))
             if end.grid[r][c] >= 1:
-                s2.append((r, c))
+                S2.append((r, c))
 
-    s1.sort()
-    s2.sort()
+    S1.sort()
+    S2.sort()
 
-    total = 0
-    length = min(len(s1), len(s2))
-    for i in range(length):
-        r1, c1 = s1[i]
-        r2, c2 = s2[i]
-        total += abs(r1 - r2) + abs(c1 - c2)
+    Total = 0
+    Length = min(len(S1), len(S2))
+    for i in range(Length):
+        r1, c1 = S1[i]
+        r2, c2 = S2[i]
+        Total += abs(r1 - r2) + abs(c1 - c2)
 
-    total += abs(len(s1) - len(s2))
-    return total
+    Total += abs(len(S1) - len(S2))
+    return Total
 
 
 def path_astar(start, end):
-    """A* Search using Manhattan heuristic."""
+    """A* search with Manhattan heuristic."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
-        return [start]
+        return []
 
     OpenList = [start]
     CameFrom = {}
+    MoveTo = {}
     g = {GridToKey(start.grid): 0}
     f = {GridToKey(start.grid): manhattan_heuristic(start, end)}
-    closed = set()
+    Closed = set()
 
     while OpenList:
-        # Find node with lowest f-score
-        current = OpenList[0]
-        BestF = f[GridToKey(current.grid)]
+        # get node with lowest f-score
+        Current = OpenList[0]
+        BestF = f[GridToKey(Current.grid)]
         for s in OpenList:
-            key = GridToKey(s.grid)
-            if f[key] < BestF:
-                current = s
-                BestF = f[key]
+            Key = GridToKey(s.grid)
+            if f[Key] < BestF:
+                Current = s
+                BestF = f[Key]
 
-        OpenList.remove(current)
-        closed.add(GridToKey(current.grid))
+        OpenList.remove(Current)
+        Closed.add(GridToKey(Current.grid))
 
-        if StatesEqual(current, end):
-            # Reconstruct path
-            path = [current]
-            key = GridToKey(current.grid)
-            while key in CameFrom:
-                key = CameFrom[key]
-                PrevGrid = [list(r) for r in key]
-                PrevState = State(PrevGrid)
-                path.insert(0, PrevState)
-            return path
+        if StatesEqual(Current, end):
+            # reconstruct move sequence
+            Moves = []
+            Key = GridToKey(Current.grid)
+            while Key in CameFrom:
+                Moves.insert(0, MoveTo[Key])
+                Key = CameFrom[Key]
+            return Moves
 
-        for NextState, pos, cost in current.moves():
+        for NextState, pos, cost in Current.moves():
             KeyNext = GridToKey(NextState.grid)
-            if KeyNext in closed or not IsSafe(NextState):
+            if KeyNext in Closed or not IsSafe(NextState):
                 continue
 
-            gNew = g[GridToKey(current.grid)] + cost
+            gNew = g[GridToKey(Current.grid)] + cost
             if (KeyNext not in g) or (gNew < g[KeyNext]):
-                CameFrom[KeyNext] = GridToKey(current.grid)
+                CameFrom[KeyNext] = GridToKey(Current.grid)
+                MoveTo[KeyNext] = pos
                 g[KeyNext] = gNew
                 f[KeyNext] = gNew + manhattan_heuristic(NextState, end)
                 InOpen = False
@@ -247,40 +254,32 @@ def path_astar(start, end):
 
 
 # =====================================================
-# Minimum Cost Safe Path (Task 2g - starred)
+# Minimum Cost Safe Path (starred task)
 # =====================================================
 def min_safe(start, end):
     """
-    Find the minimum-cost safe path using Uniform Cost Search.
+    Find minimum cost path using Uniform Cost Search.
 
-    I chose UCS over other algorithms because:
-    - It always finds the optimal (lowest cost) path by expanding nodes in order
-      of their path cost from the start
-    - Doesn't need a heuristic function like A* (which is tricky to get right for
-      non-binary states where cells can have different numbers of counters)
-    - More straightforward than trying to modify A* to work with variable counter amounts
-
-    Works for both binary and non-binary states.
+    Chose UCS because:
+    - Guarantees optimal (lowest cost) path
+    - Don't need a heuristic like A* (hard to make one for non-binary states)
+    - Works for any number of counters per cell
     """
     if not IsSafe(start) or not IsSafe(end):
         return None
 
     if StatesEqual(start, end):
-        return [start]
+        return []
 
-    # Priority queue as a list: (cost, state, path)
-    Frontier = [(0, start, [start])]
-
-    # Track best cost to reach each state
+    # priority queue: (cost, state, moves)
+    Frontier = [(0, start, [])]
     BestCost = {GridToKey(start.grid): 0}
-
-    # Closed set
     Closed = set()
 
     while Frontier:
-        # Sort and get lowest cost node
+        # get lowest cost node
         Frontier.sort(key=lambda x: x[0])
-        CurrentCost, Current, Path = Frontier.pop(0)
+        CurrentCost, Current, Moves = Frontier.pop(0)
 
         CurrentKey = GridToKey(Current.grid)
 
@@ -289,11 +288,9 @@ def min_safe(start, end):
 
         Closed.add(CurrentKey)
 
-        # Check if we reached goal
         if StatesEqual(Current, end):
-            return Path
+            return Moves
 
-        # Explore neighbors
         for NextState, pos, MoveCost in Current.moves():
             NextKey = GridToKey(NextState.grid)
 
@@ -302,11 +299,10 @@ def min_safe(start, end):
 
             NewCost = CurrentCost + MoveCost
 
-            # Update if we found a better path
             if NextKey not in BestCost or NewCost < BestCost[NextKey]:
                 BestCost[NextKey] = NewCost
-                NewPath = Path + [NextState]
-                Frontier.append((NewCost, NextState, NewPath))
+                NewMoves = Moves + [pos]
+                Frontier.append((NewCost, NextState, NewMoves))
 
     return None
 
@@ -315,9 +311,9 @@ def min_safe(start, end):
 # Compare algorithms
 # =====================================================
 def compare(start, end):
-    """Print comparison results for all search algorithms."""
+    """Compare all search algorithms."""
     print("\nComparing search algorithms:\n")
-    algos = [
+    Algos = [
         ("BFS", path_BFS),
         ("DFS", path_DFS),
         ("IDDFS", path_IDDFS),
@@ -325,10 +321,11 @@ def compare(start, end):
         ("MinSafe", min_safe)
     ]
 
-    for name, func in algos:
-        path = func(start, end)
-        if path:
-            print(f"{name:8} | Success | Path length: {len(path)} | Total cost: {PathCost(path)}")
+    for name, func in Algos:
+        Moves = func(start, end)
+        if Moves is not None:
+            Cost = PathCost(start, Moves) if Moves else 0
+            print(f"{name:8} | Success | Path length: {len(Moves)} | Total cost: {Cost}")
         else:
             print(f"{name:8} | Failed to find a path.")
 
@@ -337,52 +334,52 @@ def compare(start, end):
 # Tester
 # =====================================================
 def tester():
-    """Test harness for validating search implementations."""
+    """Test the search functions."""
     print("=== a2_path.py tester ===")
 
-    # Test 1: Empty board
+    # Test 1: trivial case
     print("\nTest 1: Empty board (start == end)")
     start = State([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     end = State([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     compare(start, end)
 
-    # Test 2: Simple 2x2 block removal
+    # Test 2: simple removal
     print("\nTest 2: 2x2 block -> 3 cells")
     start = State([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     end = State([[1, 1, 0], [1, 0, 0], [0, 0, 0]])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
 
-    # Test 3: Diagonal removal
+    # Test 3: diagonal
     print("\nTest 3: 2x2 block -> 2 diagonal cells")
     start = State([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     end = State([[1, 0, 0], [0, 1, 0], [0, 0, 0]])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
 
-    # Test 4: Larger block
+    # Test 4: bigger block
     print("\nTest 4: 2x3 block -> 2x2 block")
     start = State([[1, 1, 1, 0], [1, 1, 1, 0], [0, 0, 0, 0]])
     end = State([[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 0, 0]])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
 
-    # Test 5: Clear entire board
+    # Test 5: clear board
     print("\nTest 5: 2x2 block -> empty")
     start = State([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     end = State([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
 
-    # Test 6: Non-binary state (for min_safe)
-    print("\nTest 6: Non-binary state (2 counters -> 1 counter each)")
+    # Test 6: non-binary (multiple counters)
+    print("\nTest 6: Non-binary state")
     start = State([[2, 2, 0], [2, 2, 0], [0, 0, 0]])
     end = State([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
 
-    # Test 7: Medium complexity
-    print("\nTest 7: Medium board with varied counters")
+    # Test 7: varied counters
+    print("\nTest 7: Medium board")
     start = State([
         [1, 1, 1, 0],
         [1, 1, 2, 0],
@@ -395,6 +392,38 @@ def tester():
     ])
     print(f"Start hingers: {start.numHingers()}, End hingers: {end.numHingers()}")
     compare(start, end)
+
+    # Test 8: Showing and comparing steps for each algorithm
+    print("\n=== Search Algorithm Comparisons ===")
+    start = State([[1, 1, 0], [1, 1, 0], [0, 0, 0], [1,2, 1]])
+    end = State([[1, 1, 0], [1, 0, 0], [0, 0, 0], [1,0, 0]])
+
+    searchAlgorithms = {
+        "BFS": path_BFS,
+        "DFS": path_DFS,
+        "IDDFS": path_IDDFS,
+        "A*": path_astar,
+        "MinSafe": min_safe,
+    }
+
+    for name, func in searchAlgorithms.items():
+        print(f"\n=== {name} Example showing moves ===")
+        Moves = func(start, end)
+
+        if Moves:
+            print(f"Moves: {Moves}")
+            print("Start state:")
+            print(start)
+            Current = start
+            for i, move in enumerate(Moves):
+                r, c = move
+                print(f"\nMove {i + 1} at {move}:")
+                NewGrid = [row[:] for row in Current.grid]
+                NewGrid[r][c] -= 1
+                Current = State(NewGrid)
+                print(Current)
+        else:
+            print(f"No valid moves found with {name}.")
 
 
 if __name__ == "__main__":
