@@ -76,13 +76,22 @@ class State:
     def numHingers(self):
         """
         Returns the number of hingers.
-        These are cells with only 1 counter.
-        A hinger is a special type of active cell: it has only one counter
-        and when a move is made on a hinger (i.e., the last counter is removed from this cell), the
-        cell becomes empty and the number of active regions on the board increases by one or
-        more.
+        A hinger is a cell with 1 counter that, when removed, increases the number of regions.
         """
-        return sum(cell == 1 for row in self.grid for cell in row)
+        original_regions = self.numRegions()
+        hinger_count = 0
+
+        for r in range(self.rows):
+            for c in range(self.cols):
+                if self.grid[r][c] == 1:
+                    self.grid[r][c] = 0
+                    new_regions = self.numRegions()
+                    self.grid[r][c] = 1
+
+                    if new_regions > original_regions:
+                        hinger_count += 1
+
+        return hinger_count
     
     def move_cost(self, r, c):
         """
