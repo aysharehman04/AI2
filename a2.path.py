@@ -211,7 +211,6 @@ def path_astar(start, end):
     Closed = set()
 
     while OpenList:
-        # get node with lowest f-score
         Current = OpenList[0]
         BestF = f[GridToKey(Current.grid)]
         for s in OpenList:
@@ -224,7 +223,6 @@ def path_astar(start, end):
         Closed.add(GridToKey(Current.grid))
 
         if StatesEqual(Current, end):
-            # reconstruct move sequence
             Moves = []
             Key = GridToKey(Current.grid)
             while Key in CameFrom:
@@ -271,13 +269,11 @@ def min_safe(start, end):
     if StatesEqual(start, end):
         return []
 
-    # priority queue: (cost, state, moves)
     Frontier = [(0, start, [])]
     BestCost = {GridToKey(start.grid): 0}
     Closed = set()
 
     while Frontier:
-        # get lowest cost node
         Frontier.sort(key=lambda x: x[0])
         CurrentCost, Current, Moves = Frontier.pop(0)
 
