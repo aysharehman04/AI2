@@ -43,10 +43,12 @@ SIDEBAR_COLOUR = "#D1FCC5"
 HISTORY_COLOUR = "#E1FFD9"
 
 
+
+
 header = tk.Frame(root, bg=BG, pady=10, padx=60)
 header.grid(row=0, column=0, columnspan=2, sticky="ew")
 
-board_frame = tk.Frame(root, bg=BOARD_BG, padx=50, pady=50)
+board_frame = tk.Frame(root, bg=BOARD_BG, padx=20, pady=20)
 board_frame.grid(row=1, column=0, padx=50)
 
 sidebar = tk.Frame(root,bg=SIDEBAR_COLOUR, padx=20, pady=20)
@@ -55,10 +57,10 @@ sidebar.grid(row=1, column=1, sticky="n", padx=6)
 title_font = tkfont.Font(family="Helvetica", size=30, weight="bold")
 subtitle_font = tkfont.Font(family="Helvetica", size=19)
 
-title = tk.Label(header, text="B1 — Hinger",bg=BG, font=title_font)
+title = tk.Label(header, text="B1 - Hinger",bg=BG, font=title_font)
 title.pack(pady=(0,5))
 
-subtitle = tk.Label(header, text=" Instructions: Click a cell to remove a counter! The first player to make a move on a hinger wins the game!",bg=BG, font=subtitle_font)
+subtitle = tk.Label(header, text="Instructions: Click a cell to remove a counter! The first player to make a move on a hinger wins the game!",bg=BG, font=subtitle_font)
 subtitle.pack()
 
 status_label = tk.Label(sidebar, text="Turn: Human", pady=10, bg=SIDEBAR_COLOUR )
