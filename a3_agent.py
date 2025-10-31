@@ -2,10 +2,7 @@
 Group ID: B1
 Student ID: 
 100464246
-
-"""
-"""
-State class for the Hinger game
+100435561
 """
 
 from a1_state import State
@@ -101,7 +98,14 @@ class Agent:
         
     
 
-   
+    def move(self, state, mode):
+        print(f"Agent {self.name} using {mode.upper()} strategy...")
+        if mode == "minimax":
+            return self.minimax_move(state)
+        if mode == "alphabeta":
+            return self.alphabeta_move(state)
+        else:
+            raise ValueError(f"Unknown mode: {mode}") 
        
           
         
