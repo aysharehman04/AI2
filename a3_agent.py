@@ -2,10 +2,7 @@
 Group ID: B1
 Student ID: 
 100464246
-
-"""
-"""
-State class for the Hinger game
+100435561
 """
 
 from a1_state import State

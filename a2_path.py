@@ -3,8 +3,7 @@
 Group ID: B1
 Student ID: 
 100464246
-
-
+100435561
 """
 """
 Contains a set of functions for determining and retrieving safe paths
