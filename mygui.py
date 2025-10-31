@@ -4,10 +4,6 @@ from a3_agent import Agent
 import tkinter.font as tkfont
 
 
-
-
-
-
 # Example grid to initialise the State
 initial_grid = [
     [2, 1, 0, 0, 0],
