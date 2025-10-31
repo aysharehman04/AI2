@@ -1,137 +1,210 @@
+# a4_game.py
+"""
+Group ID: B1
+Student ID: 100464246
+
+Task 4 – Hinger Game Implementation
+
+This module implements the core gameplay loop for the Hinger game.
+"""
+
 from a1_state import State
 from a3_agent import Agent
 
-# a4_game
-"""
-Hinger Game Core Gameplay Module
-"""
 
-import time
-from a1_state import State
-from a3_agent import Agent
+def play(state, agentA, agentB):
+    """
+    Play a complete game between two agents or human players.
 
-def play(state, agentA=None, agentB=None, default_mode="alphabeta", turn_time_limit=None):
+    agentA/agentB can be Agent objects or None (for human player).
+    Returns the name of the winner, or None for a draw.
     """
-    Simulate a Hinger game between two players (AI or human).
-    
-    Args:
-        state (State): The initial game state.
-        agentA (Agent or None): Player A agent, or None for human.
-        agentB (Agent or None): Player B agent, or None for human.
-        default_mode (str): The strategy mode to use for AI agents.
-        turn_time_limit (float or None): Optional per-turn time limit in seconds.
-        
-    Returns:
-        str or None: Name of the winner if there is one, else None for draw.
-    """
-    current_state = state.clone()
-    players = [(agentA, "PlayerA"), (agentB, "PlayerB")]
-    turn = 0
-    move_count = 0
-    move_history = []
+    CurrentState = state
+    Players = [agentA, agentB]
+    PlayerNames = [
+        agentA.name if agentA else "Human A",
+        agentB.name if agentB else "Human B"
+    ]
+    Turn = 0
+    MoveCount = 0
+
+    print("=== Starting Hinger Game ===")
+    print(f"Player 1: {PlayerNames[0]}")
+    print(f"Player 2: {PlayerNames[1]}")
+    print("\nInitial board:")
+    print(CurrentState)
+    print()
 
     while True:
-        agent, name = players[turn % 2]
-        print(f"\n{name}'s turn (Move {move_count + 1}):")
-        print(current_state)
+        CurrentPlayer = Players[Turn]
+        CurrentName = PlayerNames[Turn]
 
-        start_time = time.time()
+        print(f"\n--- Turn {MoveCount + 1}: {CurrentName}'s move ---")
+        print("Current board:")
+        print(CurrentState)
+        print()
 
-        # Determine move
-        if agent is None:
-            # Human player
-            try:
-                r = int(input("Enter row: "))
-                c = int(input("Enter column: "))
-                move = (r, c)
-            except ValueError:
-                print(f"Invalid input! {name} loses.")
-                return players[(turn + 1) % 2][1]
-        else:
-            # AI agent
-            score_move = agent.move(current_state, default_mode)
-            if score_move is None:
-                print(f"No moves available for {name}. {players[(turn + 1) % 2][1]} wins!")
-                return players[(turn + 1) % 2][1]
-            _, move = score_move
-            if not isinstance(move, tuple) or len(move) != 2:
-                print(f"Invalid move format returned by {name}. {players[(turn + 1) % 2][1]} wins!")
-                return players[(turn + 1) % 2][1]
+        # check if board is empty (draw)
+        IsEmpty = True
+        for r in range(CurrentState.rows):
+            for c in range(CurrentState.cols):
+                if CurrentState.grid[r][c] > 0:
+                    IsEmpty = False
+                    break
+            if not IsEmpty:
+                break
 
-        # Optional turn time limit
-        if turn_time_limit is not None:
-            elapsed = time.time() - start_time
-            if elapsed > turn_time_limit:
-                print(f"{name} exceeded turn time limit! {players[(turn + 1) % 2][1]} wins!")
-                return players[(turn + 1) % 2][1]
-
-        r, c = move
-
-        # Check for illegal move
-        if not (0 <= r < current_state.rows and 0 <= c < current_state.cols):
-            print(f"Illegal move by {name}! {players[(turn + 1) % 2][1]} wins!")
-            return players[(turn + 1) % 2][1]
-        if current_state.grid[r][c] <= 0:
-            print(f"Illegal move on empty cell by {name}! {players[(turn + 1) % 2][1]} wins!")
-            return players[(turn + 1) % 2][1]
-
-        # Apply move
-        current_state.grid[r][c] -= 1
-        move_count += 1
-        move_history.append((name, (r, c)))
-
-        # Check for hinger-triggered win
-        if current_state.grid[r][c] == 0:
-            regions_after = current_state.numRegions()
-            if regions_after > 1:
-                print(f"{name} triggered a hinger! {name} wins!")
-                return name
-
-        # Check for draw (all counters zero)
-        if all(cell == 0 for row in current_state.grid for cell in row):
-            print("All counters removed. Game is a draw!")
+        if IsEmpty:
+            print("All counters removed - DRAW!")
             return None
 
-        # Next turn
-        turn += 1
+        # get move
+        if CurrentPlayer is None:
+            # human player
+            Move = GetHumanMove(CurrentState)
+        else:
+            # agent player
+            Move = GetAgentMove(CurrentPlayer, CurrentState)
+
+        # validate move
+        if Move is None:
+            print(f"Invalid move by {CurrentName}!")
+            OpponentName = PlayerNames[1 - Turn]
+            print(f"{OpponentName} wins!")
+            return OpponentName
+
+        r, c = Move
+        if not IsValidMove(CurrentState, r, c):
+            print(f"Illegal move by {CurrentName} at {Move}!")
+            OpponentName = PlayerNames[1 - Turn]
+            print(f"{OpponentName} wins!")
+            return OpponentName
+
+        # check if move is on a hinger
+        WasHinger = IsHinger(CurrentState, r, c)
+
+        # apply move
+        NewGrid = [row[:] for row in CurrentState.grid]
+        NewGrid[r][c] -= 1
+        CurrentState = State(NewGrid)
+
+        print(f"{CurrentName} moves at {Move}")
+        MoveCount += 1
+
+        # check win condition
+        if WasHinger:
+            print("\nFinal board:")
+            print(CurrentState)
+            print(f"\n{CurrentName} hit a HINGER and WINS!")
+            return CurrentName
+
+        # switch turns
+        Turn = 1 - Turn
+
+
+def GetHumanMove(state):
+    """Get move from human player via input."""
+    try:
+        print("Enter your move (row col): ", end="")
+        Inp = input().strip()
+        Parts = Inp.split()
+        if len(Parts) != 2:
+            return None
+        r = int(Parts[0])
+        c = int(Parts[1])
+        return (r, c)
+    except:
+        return None
+
+
+def GetAgentMove(agent, state):
+    """Get move from agent using its default strategy."""
+    try:
+        # use first available mode
+        Mode = agent.modes[0] if agent.modes else 'minimax'
+        Score, Move = agent.move(state, Mode)
+        return Move
+    except:
+        return None
+
+
+def IsValidMove(state, r, c):
+    """Check if a move is valid."""
+    # check bounds
+    if r < 0 or r >= state.rows or c < 0 or c >= state.cols:
+        return False
+    # check if cell has counters
+    if state.grid[r][c] <= 0:
+        return False
+    return True
+
+
+def IsHinger(state, r, c):
+    """Check if a cell is a hinger."""
+    # must have exactly 1 counter
+    if state.grid[r][c] != 1:
+        return False
+
+    OriginalRegions = state.numRegions()
+
+    # simulate removing the counter
+    TestGrid = [row[:] for row in state.grid]
+    TestGrid[r][c] = 0
+    TestState = State(TestGrid)
+    NewRegions = TestState.numRegions()
+
+    # hinger if regions increase
+    return NewRegions > OriginalRegions
+
 
 def tester():
-    """
-    Test the play() function by simulating a game between two AI agents.
-    """
-    initial_grid = [
-        [1, 1, 0, 0],
-        [0, 1, 0, 1],
-        [1, 0, 1, 0],
-        [0, 0, 0, 1]
+    """Test the game implementation."""
+    print("=== a4_game.py tester ===\n")
+
+    # Test 1: agent vs agent
+    print("Test 1: Agent vs Agent")
+    TestGrid = [
+        [1, 1, 0],
+        [1, 1, 0],
+        [0, 0, 0]
     ]
-    state = State(initial_grid)
+    TestState = State(TestGrid)
+    AgentA = Agent((3, 3), "Alpha")
+    AgentB = Agent((3, 3), "Beta")
 
-    # # Create two AI agents
-    # agentA = Agent(size=(4,4), name="AgentA")
-    # agentB = Agent(size=(4,4), name="AgentB")
+    Winner = play(TestState, AgentA, AgentB)
+    print(f"\nResult: {Winner if Winner else 'Draw'}\n")
 
-    # print("Starting Hinger game between AgentA and AgentB...")
-    # winner = play(state, agentA, agentB, default_mode="alphabeta", turn_time_limit=10)
+    # Test 2: smaller game
+    print("\n" + "=" * 50)
+    print("Test 2: Smaller board")
+    TestGrid2 = [
+        [1, 1],
+        [1, 0]
+    ]
+    TestState2 = State(TestGrid2)
+    AgentC = Agent((2, 2), "Charlie")
+    AgentD = Agent((2, 2), "Delta")
 
-    # if winner is None:
-    #     print("Game ended in a draw.")
-    # else:
-    #     print(f"The winner is: {winner}")
-    agentA = None
-    agentB = Agent(size=(4,4), name="AgentD")
-    winner = play(state, agentA, agentB, default_mode="alphabeta", turn_time_limit=10)
+    Winner2 = play(TestState2, AgentC, AgentD)
+    print(f"\nResult: {Winner2 if Winner2 else 'Draw'}\n")
 
-    if winner is None:
-        print("Game ended in a draw.")
-    else:
-        print(f"The winner is: {winner}")
+    # Test 3: example with potential hinger
+    print("\n" + "=" * 50)
+    print("Test 3: Board with hinger")
+    TestGrid3 = [
+        [1, 0, 1],
+        [0, 1, 0],
+        [1, 0, 1]
+    ]
+    TestState3 = State(TestGrid3)
+    print(f"Initial hingers: {TestState3.numHingers()}")
+    AgentE = Agent((3, 3), "Echo")
+    AgentF = Agent((3, 3), "Foxtrot")
 
+    Winner3 = play(TestState3, AgentE, AgentF)
+    print(f"\nResult: {Winner3 if Winner3 else 'Draw'}\n")
 
-
-    
 
 if __name__ == "__main__":
     tester()
-
-
