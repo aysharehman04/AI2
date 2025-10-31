@@ -61,6 +61,7 @@ def play(state, agentA, agentB):
             Move = GetHumanMove(CurrentState)
         else:
             Move = GetAgentMove(CurrentPlayer, CurrentState)
+            print(f"DEBUG: Agent returned move {Move}")
 
         if Move is None:
             print(f"Invalid move by {CurrentName}!")
@@ -113,7 +114,9 @@ def GetAgentMove(agent, state):
     try:
         Mode = agent.modes[0] if agent.modes else 'minimax'
         Score, Move = agent.move(state, Mode)
+        print(f"Agent chose move {Move} with score {Score}")
         return Move
+    
     except:
         return None
 
@@ -193,6 +196,9 @@ def tester():
 
     Winner = play(TestState, None, AgentB)  # Human vs Agent
     Winner = play(TestState, None, None)  # Human vs Human
+
+    Winner = play(TestState3, None, AgentE)  # Human vs Agent
+    Winner = play(TestState3, None, None)  # Human vs Human
 
 
 if __name__ == "__main__":

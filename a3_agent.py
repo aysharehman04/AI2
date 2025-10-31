@@ -17,15 +17,15 @@ class Agent:
     
 
     def win(self, state):
-        return state.numHingers() > 0
+       return all(cell == 0 for row in state.grid for cell in row)
     
     
     def is_terminal(self, state):
     
         # need section for checking if there is a win
-        if self.win(state):
-            print("this state is a winner state ")
-            return True
+        # if self.win(state):
+        #     print("this state is a winner state ")
+        #     return True
         
         for rows in state.grid:
             for cell in rows:
@@ -37,29 +37,38 @@ class Agent:
         return True  # no moves found
     
     def evaluate(self,state):
-        total_move_cost = sum(state.move_cost(r, c)
-                          for r in range(state.rows)
-                          for c in range(state.cols)
-                          if state.grid[r][c] > 0)
-    
-         # Fewer hingers is better
-        hinger_score = -state.numHingers()
-        
-        # More regions is better
-        region_score = state.numRegions()
-        
-        # Weighted sum
-        score = total_move_cost + 2 * region_score + 3 * hinger_score
+        if self.win(state):
+            return float('inf')
+
+        hingers = state.numHingers()
+        regions = state.numRegions()
+        total_counters = sum(sum(row) for row in state.grid)
+        moves_available = sum(
+            1 for r in range(state.rows)
+            for c in range(state.cols)
+            if state.grid[r][c] > 0
+        )
+
+        # New: position-based score
+        center_r, center_c = state.rows // 2, state.cols // 2
+        position_score = 0
+        for r in range(state.rows):
+            for c in range(state.cols):
+                if state.grid[r][c] > 0:
+                    # closer to center gets a bonus
+                    dist = abs(center_r - r) + abs(center_c - c)
+                    position_score += (2 - dist)
+
+        score = (
+            hingers * 20
+            + regions * 5
+            + moves_available * 2
+            - total_counters * 1.5
+            + position_score * 1.2
+        )
+
         return score
-    
-    def find_diff(self, old_state, new_state):
-        """Return (i, j) of the cell that changed between two states."""
-        for i in range(len(old_state.grid)):
-            for j in range(len(old_state.grid[0])):
-                if old_state.grid[i][j] != new_state.grid[i][j]:
-                    return (i, j)
-        return None
-    
+        
     
 
     def move(self, state, mode):
@@ -73,19 +82,22 @@ class Agent:
        
           
         
-    def minimax_move(self, state, depth = 3, max_player = True):
+    def minimax_move(self, state, depth = 3, max_player = True, root = True):
+        
 
         #base case:
         if depth == 0 or self.is_terminal(state):
-            score =  self.evaluate(state)
             # print(f"Depth {depth}, Player {'MAX' if max_player else 'MIN'}, Evaluated score: {score}")
-            return score, None
+        
+            return self.evaluate(state), None
         
         if max_player:
             best_score = float('-inf')
             best_move = None
             for new_state, move, cost in state.moves():
-                score, _ = self.minimax_move(new_state, depth-1, False)
+                score, _ = self.minimax_move(new_state, depth-1, False, root = False)
+                if root:  # 👈 Only print for top-level moves
+                    print(f"Move {move} -> score {score}")
                 if score > best_score:
                     best_score = score
                     best_move = move
@@ -94,7 +106,7 @@ class Agent:
             best_score = float('inf')
             best_move = None
             for new_state, move, cost in state.moves():
-                score, _ = self.minimax_move(new_state, depth-1, True)
+                score, _ = self.minimax_move(new_state, depth-1, True, root = False)
                 if score < best_score:
                     best_score = score
                     best_move = move
@@ -141,35 +153,35 @@ def tester():
     print("Agent tester:")
 
     agent = Agent((5,4))
-    print(agent)
-    sa_grid2 = [
-            [1, 1, 0, 0, 2],
-            [1, 1, 0, 0, 0],
-            [0, 0, 1, 1, 1],
-            [0, 0, 0, 1, 1]
-    ]
-    state = State(sa_grid2)
-    print("Is terminal?",agent.is_terminal(state))
-    print("\n")
+    # print(agent)
+    # sa_grid2 = [
+    #         [1, 1, 0, 0, 2],
+    #         [1, 1, 0, 0, 0],
+    #         [0, 0, 1, 1, 1],
+    #         [0, 0, 0, 1, 1]
+    # ]
+    # state = State(sa_grid2)
+    # print("Is terminal?",agent.is_terminal(state))
+    # print("\n")
 
 
-    print("Testing Minimax:")
-    def run_minimax():
-        score, move = agent.minimax_move(state)
-        # print(score, move)
-        print("\n")
+    # print("Testing Minimax:")
+    # def run_minimax():
+    #     score, move = agent.minimax_move(state)
+    #     # print(score, move)
+    #     print("\n")
 
-    avg_time = timeit.timeit(run_minimax, number=10) / 10
-    print(f"Average Minimax time over 10 runs: {avg_time:.6f} seconds")
+    # avg_time = timeit.timeit(run_minimax, number=10) / 10
+    # print(f"Average Minimax time over 10 runs: {avg_time:.6f} seconds")
 
-    print("Testing Alphabeta:")
-    def run_alphabeta():
-        score, move = agent.alphabeta_move(state)
-        # print(score, move)
-        print("\n")
+    # print("Testing Alphabeta:")
+    # def run_alphabeta():
+    #     score, move = agent.alphabeta_move(state)
+    #     # print(score, move)
+    #     print("\n")
 
-    avg_time = timeit.timeit(run_alphabeta, number=10) / 10
-    print(f"Average alphabeta time over 10 runs: {avg_time:.6f} seconds")
+    # avg_time = timeit.timeit(run_alphabeta, number=10) / 10
+    # print(f"Average alphabeta time over 10 runs: {avg_time:.6f} seconds")
 
 
 
@@ -182,7 +194,7 @@ def tester():
     ]
     state2 = State(sa_grid3)
     print("Is terminal?",agent.is_terminal(state2))
-
+    print("Is winning pos?",agent.win(state2))
 
     #best_move = agent.minimax_move(sa)
     #print(best_move)
