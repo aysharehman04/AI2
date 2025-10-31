@@ -3,13 +3,10 @@ Group ID: B1
 Student ID: 
 100464246
 100428936
-
-
-
-"""
-"""
-State class for the Hinger game
 100435561
+"""
+"""
+Agent class for the Hinger game
 """
 
 from a1_state import State
@@ -48,27 +45,28 @@ class Agent:
             return self.alphabeta_move(state)
         else:
             raise ValueError(f"Unknown mode: {mode}") 
-        
+
+    """
+    d. Additional supporting methods as needed to facilitate decision-making and
+    strategy implementation for playing a binary Hinger game (that is, the game
+    starts with a binary state). Your modes list should contain (i) an element
+    named ‘minimax’, for which your agent plays using the minimax strategy, and
+    (ii) an element named ‘alphabeta’, for which the agent plays using the alpha-
+    beta pruning strategy.
+    """    
 
     def win(self, state):
        return all(cell == 0 for row in state.grid for cell in row)
     
     
     def is_terminal(self, state):
-    
-        # need section for checking if there is a win
-        if self.win(state):
-        #    print("this state is a winner state ")          Sorry just had to comment this out as it was being
-            return True                                     #called everytime minimax evaluated causing massive repeated outputs
-                                                            #-Luca
+        if self.win(state):  
+            return True                                     
         for rows in state.grid:
             for cell in rows:
                 if cell > 0 : 
-                     # found a move
-                    # print("found a possible move ")
                     return False
-      #  print("no possible moves found")                   Same as above^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        return True  # no moves found
+        return True
     
     def evaluate(self,state):
         if self.win(state):
@@ -102,23 +100,8 @@ class Agent:
         )
 
         return score
-        
-    
-
-    def move(self, state, mode):
-        print(f"Agent {self.name} using {mode.upper()} strategy...")
-        if mode == "minimax":
-            return self.minimax_move(state)
-        if mode == "alphabeta":
-            return self.alphabeta_move(state)
-        else:
-            raise ValueError(f"Unknown mode: {mode}") 
        
-          
-        
     def minimax_move(self, state, depth = 3, max_player = True, root = True):
-        
-
         #base case:
         if depth == 0 or self.is_terminal(state):
             # print(f"Depth {depth}, Player {'MAX' if max_player else 'MIN'}, Evaluated score: {score}")
@@ -181,8 +164,9 @@ class Agent:
                     break   # α cutoff → prune
             return min_score, best_move
 
-
-
+"""
+Tester 
+"""
 def tester():
     print("Agent tester:")
 
@@ -217,9 +201,6 @@ def tester():
     avg_time = timeit.timeit(run_alphabeta, number=10) / 10
     print(f"Average alphabeta time over 10 runs: {avg_time:.6f} seconds")
 
-
-
-
     sa_grid3 = [
             [1, 1, 0, 0, 1],
             [1, 1, 0, 0, 0],
@@ -229,27 +210,6 @@ def tester():
     state2 = State(sa_grid3)
     print("Is terminal?",agent.is_terminal(state2))
     print("Is winning pos?",agent.win(state2))
-
-    #best_move = agent.minimax_move(sa)
-    #print(best_move)
-    # sa_grid1 = [
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0]
-    # ]
-    # sa1 = State(sa_grid1)
-    # print(agent.is_terminal(sa1))
-   
-    # sa_grid3 = [
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0]
-    # ]
-    # sa3 = State(sa_grid3)
-    # print(agent.is_terminal(sa3))
-
 
 if __name__ == "__main__":
      tester()

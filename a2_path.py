@@ -4,10 +4,6 @@ Group ID: B1
 Student ID: 
 100464246
 100428936
-
-
-
-
 100435561
 """
 """
@@ -370,7 +366,7 @@ Tester
 def tester():
     print("--- a2_path.py tester ---")
 
-    # Test 1: trivial case
+    # Test 1: small case
     print("\nTest 1: Empty board (start == end)")
     start = State([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     end = State([[0, 0, 0], [0, 0, 0], [0, 0, 0]])

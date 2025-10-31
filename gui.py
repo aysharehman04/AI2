@@ -3,11 +3,11 @@ Group ID: B1
 Student ID: 
 100464246
 100428936
-
+100435561
 
 """
 """
-gui.py -> Graphical interface file 
+Graphical interface file for visual gameplay of Hinger game.
 """
 import tkinter as tk
 from a1_state import State
@@ -73,7 +73,7 @@ subtitle_font = tkfont.Font(family="Helvetica", size=19)
 title = tk.Label(header, text="B1 - Hinger",bg=BG, font=title_font)
 title.pack(pady=(0,5))
 
-subtitle = tk.Label(header, text="Instructions: Click a cell to remove a counter! The first player to make a move on a hinger wins the game!",bg=BG, font=subtitle_font)
+subtitle = tk.Label(header, text="Instructions: Click a cell to remove a counter. The first player to make a move on a hinger wins the game!",bg=BG, font=subtitle_font)
 subtitle.pack()
 
 status_label = tk.Label(sidebar, text="Turn: Human", pady=10, bg=SIDEBAR_COLOUR )
@@ -84,10 +84,6 @@ moves_label.pack()
 
 history_box = tk.Listbox(sidebar, height=12, width=20, bg=HISTORY_COLOUR, bd=0)
 history_box.pack()
-
-
-
-
 
 def on_click(r, c):
     global current_player, game_over, state
@@ -117,7 +113,6 @@ def on_click(r, c):
         current_player = 1
         status_label.config(text="Turn: Agent" if GAME_MODE == "human_vs_agent" else "Turn: Player 2")
       
-
         # Agent move (if applicable)
         if GAME_MODE == "human_vs_agent":
             root.after(1000, agent_move)
@@ -156,7 +151,6 @@ root.configure(bg=BG)
 board_frame.configure(bg=BOARD_BG, relief="groove", bd=6)
 
 
-
 for r in range(state.rows):
     row_buttons = []
     for c in range(state.cols):
@@ -181,21 +175,7 @@ for r in range(state.rows):
         lbl.bind("<Enter>", lambda e, r=r, c=c: e.widget.config(bg="#F8B7F0"))  # hover color
         lbl.bind("<Leave>", lambda e, r=r, c=c: update_button_color(r, c))      # reset color
 
-
         row_buttons.append(lbl)
-        # btn = tk.Button(
-        #     cell_frame, 
-        #     width=8,
-        #     height=4,
-        #     bg=CELL_BG,
-        #     activebackground="#F8B7F0",
-        #     text=str(state.grid[r][c]),
-        #     command=lambda r=r ,c=c: on_click(r,c),
-        #     highlightthickness=0,
-        #     relief="solid"
-        # )
-        # btn.grid(row=r, column=c,padx=4, pady=4)
-        # row_buttons.append(btn)
     buttons.append(row_buttons)
 
 if GAME_MODE == "agent_vs_agent":
@@ -216,8 +196,6 @@ def show_end_message(message):
 for r in range(state.rows):
     for c in range(state.cols):
         update_button_color(r, c)
-
-
 
 root.mainloop()
 

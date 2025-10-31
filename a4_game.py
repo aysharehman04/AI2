@@ -4,12 +4,11 @@ Group ID: B1
 Student ID: 
 100464246
 100428936
-
-
-"""
-"""
-State class for the Hinger game
 100435561
+
+"""
+"""
+Core gameplay loop for the Hinger game.
 """
 
 from a1_state import State
@@ -22,6 +21,7 @@ def play(state, agentA, agentB):
 
     agentA/agentB can be Agent objects or None (for human player).
     Returns the name of the winner, or None for a draw.
+    Detects and handles illegal moves.
     """
     CurrentState = state
     Players = [agentA, agentB]

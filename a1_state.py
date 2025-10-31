@@ -4,17 +4,11 @@ Group ID: B1
 Student ID:
 100464246
 100428936
-
-
-
-
 100435561
 """
 """
 State class for the Hinger game
-
 """
-from copy import deepcopy
 class State:
     def __init__(self, grid):
         """
@@ -139,8 +133,6 @@ class State:
         https://docs.python.org/3.12/library/copy.html
         """
         return State([row[:] for row in self.grid])
-        # """Return a deep copy of the state."""
-        # return deepcopy(self)
         
     
 def tester():
