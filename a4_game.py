@@ -94,7 +94,6 @@ def play(state, agentA, agentB):
 
 
 def GetHumanMove(state):
-    """Get move from human player via input."""
     try:
         print("Enter your move (row col): ", end="")
         Inp = input().strip()
@@ -119,7 +118,6 @@ def GetAgentMove(agent, state):
 
 
 def IsValidMove(state, r, c):
-    """Check if a move is valid."""
     if r < 0 or r >= state.rows or c < 0 or c >= state.cols:
         return False
     if state.grid[r][c] <= 0:
@@ -128,8 +126,6 @@ def IsValidMove(state, r, c):
 
 
 def IsHinger(state, r, c):
-    """Check if a cell is a hinger."""
-    # must have exactly 1 counter
     if state.grid[r][c] != 1:
         return False
 
