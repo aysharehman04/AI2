@@ -1,11 +1,11 @@
 # a4_game.py
 """
 Group ID: B1
-Student ID: 100464246
-
-Task 4 – Hinger Game Implementation
-
-This module implements the core gameplay loop for the Hinger game.
+Student ID: 
+100464246
+"""
+"""
+State class for the Hinger game
 """
 
 from a1_state import State
@@ -95,7 +95,6 @@ def play(state, agentA, agentB):
 
 
 def GetHumanMove(state):
-    """Get move from human player via input."""
     try:
         print("Enter your move (row col): ", end="")
         Inp = input().strip()
@@ -122,7 +121,6 @@ def GetAgentMove(agent, state):
 
 
 def IsValidMove(state, r, c):
-    """Check if a move is valid."""
     if r < 0 or r >= state.rows or c < 0 or c >= state.cols:
         return False
     if state.grid[r][c] <= 0:
@@ -131,8 +129,6 @@ def IsValidMove(state, r, c):
 
 
 def IsHinger(state, r, c):
-    """Check if a cell is a hinger."""
-    # must have exactly 1 counter
     if state.grid[r][c] != 1:
         return False
 
@@ -147,8 +143,7 @@ def IsHinger(state, r, c):
 
 
 def tester():
-    """Test the game implementation."""
-    print("=== a4_game.py tester ===\n")
+    print("--- a4_game.py tester ---\n")
 
     # Test 1: agent vs agent
     print("Test 1: Agent vs Agent")
@@ -165,7 +160,7 @@ def tester():
     print(f"\nResult: {Winner if Winner else 'Draw'}\n")
 
     # Test 2: smaller game
-    print("\n" + "=" * 50)
+    print("\n" + "-" * 50)
     print("Test 2: Smaller board")
     TestGrid2 = [
         [1, 1],
@@ -179,7 +174,7 @@ def tester():
     print(f"\nResult: {Winner2 if Winner2 else 'Draw'}\n")
 
     # Test 3: example with potential hinger
-    print("\n" + "=" * 50)
+    print("\n" + "-" * 50)
     print("Test 3: Board with hinger")
     TestGrid3 = [
         [1, 0, 1],
@@ -194,8 +189,8 @@ def tester():
     Winner3 = play(TestState3, AgentE, AgentF)
     print(f"\nResult: {Winner3 if Winner3 else 'Draw'}\n")
 
-    Winner = play(TestState, None, AgentB)  # Human vs Agent
-    Winner = play(TestState, None, None)  # Human vs Human
+    Winner = play(TestState, None, AgentB)  # Human vs agent running off of Test 1
+    Winner = play(TestState, None, None)  # Human vs human running off of Test 1
 
     Winner = play(TestState3, None, AgentE)  # Human vs Agent
     Winner = play(TestState3, None, None)  # Human vs Human
