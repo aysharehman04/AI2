@@ -191,8 +191,8 @@ def tester():
     Winner3 = play(TestState3, AgentE, AgentF)
     print(f"\nResult: {Winner3 if Winner3 else 'Draw'}\n")
 
-    Winner = play(TestState, None, AgentB)  # Human vs Agent
-    Winner = play(TestState, None, None)  # Human vs Human
+    Winner = play(TestState, None, AgentB)  # Human vs agent running off of Test 1
+    Winner = play(TestState, None, None)  # Human vs human running off of Test 1
 
 
 if __name__ == "__main__":
