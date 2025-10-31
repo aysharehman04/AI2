@@ -24,16 +24,16 @@ class Agent:
     
         # need section for checking if there is a win
         if self.win(state):
-            print("this state is a winner state ")
-            return True
-        
+        #    print("this state is a winner state ")          Sorry just had to comment this out as it was being
+            return True                                     #called everytime minimax evaluated causing massive repeated outputs
+                                                            #-Luca
         for rows in state.grid:
             for cell in rows:
                 if cell > 0 : 
                      # found a move
                     # print("found a possible move ")
                     return False
-        print("no possible moves found")
+      #  print("no possible moves found")                   Same as above^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         return True  # no moves found
     
     def evaluate(self,state):
