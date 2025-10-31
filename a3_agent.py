@@ -98,7 +98,7 @@ class Agent:
             best_move = None
             for new_state, move, cost in state.moves():
                 score, _ = self.minimax_move(new_state, depth-1, False, root = False)
-                if root:  # 👈 Only print for top-level moves
+                if root:
                     print(f"Move {move} -> score {score}")
                 if score > best_score:
                     best_score = score
