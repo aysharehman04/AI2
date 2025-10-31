@@ -1,15 +1,15 @@
 # a1_state.py
 """
 Group ID: B1
-Student IDs:
+Student ID:
 100464246
-
-
-
+100435561
 """
 """
 State class for the Hinger game
+
 """
+from copy import deepcopy
 class State:
     def __init__(self, grid):
         """
@@ -40,7 +40,8 @@ class State:
                     new_state = self.clone()
                     new_state.grid[r][c] -= 1
                     yield (new_state, (r,c), self.move_cost(r, c))
-    
+ 
+       
     def numRegions(self):
         """
         d. A method numRegions() that calculates and returns the number of active
@@ -106,6 +107,7 @@ class State:
             (1,1)    # diagonal down-right
         ]
     
+
     
     def move_cost(self, r, c):
         """
@@ -132,6 +134,9 @@ class State:
         https://docs.python.org/3.12/library/copy.html
         """
         return State([row[:] for row in self.grid])
+        # """Return a deep copy of the state."""
+        # return deepcopy(self)
+        
     
 def tester():
         """
@@ -164,6 +169,14 @@ def tester():
             print(f"Move at {pos} (cost {cost}):")
             print(new_state)
             print("----")
+
+        test_grid = [
+            [1, 0, 1],
+            [0, 1, 0],
+            [1, 0, 1]
+        ]
+        print(State(test_grid).numHingers())
+        
     
 if __name__ == "__main__":
      tester()

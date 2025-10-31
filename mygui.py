@@ -2,6 +2,11 @@ import tkinter as tk
 from a1_state import State
 from a3_agent import Agent
 import tkinter.font as tkfont
+from a4_game import IsHinger, IsValidMove
+
+# turn = 0
+move_count = 0
+
 
 
 # Example grid to initialise the State
@@ -15,15 +20,10 @@ initial_grid = [
 state = State(initial_grid)
 buttons = []
 
-def on_click(r, c):
-    #make move, and update grid? 
-    if state.grid[r][c] > 0:
-        state.grid[r][c] -= 1
-        buttons[r][c].config(text=str(state.grid[r][c]), bg=CELL_BG)
-        print(f"Button clicked at ({r}, {c}) -> New value : {state.grid[r][c]}")
-        print(state)
-    else:
-        print(f"Cell ({r}, {c}) is already empty!")
+# player_types = [0, 1]  # default Human vs Agent
+
+# agent = Agent((state.rows, state.cols), "Echo")
+
 
 root = tk.Tk()
 root.geometry('1020x700') 
@@ -69,10 +69,124 @@ history_box = tk.Listbox(sidebar, height=12, width=20, bg=HISTORY_COLOUR, bd=0)
 history_box.pack()
 
 
+mode_var = tk.StringVar(value="Human vs Agent")
+
+mode_frame = tk.Frame(sidebar, bg=SIDEBAR_COLOUR, pady=10)
+mode_frame.pack()
+tk.Label(mode_frame, text="Select Mode:", bg=SIDEBAR_COLOUR).pack(anchor="w")
+
+modes = ["Human vs Human", "Human vs Agent", "Agent vs Agent"]
+for m in modes:
+    tk.Radiobutton(mode_frame, text=m, variable=mode_var, value=m, bg=SIDEBAR_COLOUR).pack(anchor="w")
+
+
+
+def on_click(r, c):
+    global turn, move_count
+      # Ignore clicks if current player is an agent
+    # if player_types[turn] == 1:
+    #     return
+  
+
+    if not IsValidMove(state, r, c):
+        print(f"Illegal move at ({r},{c})")
+        return
+
+    was_hinger = IsHinger(state, r, c)
+
+
+    #make move, and update grid? 
+    if state.grid[r][c] > 0:
+        state.grid[r][c] -= 1
+        buttons[r][c].config(text=str(state.grid[r][c]), bg=CELL_BG)
+        print(f"Button clicked at ({r}, {c}) -> New value : {state.grid[r][c]}")
+        print(state)
+    else:
+        print(f"Cell ({r}, {c}) is already empty!")
+    
+ 
+    move_count += 1
+    moves_label.config(text=f"Moves: {move_count}")
+    # history_box.insert(tk.END, f"Player {turn+1} moved at ({r},{c})")
+
+    # # Check hinger
+    # if was_hinger:
+    #     end_game(f"Player {turn+1} HIT A HINGER AND WINS!")
+    #     return
+
+    # # Check draw
+    # if all(state.grid[row][col] == 0 for row in range(state.rows) for col in range(state.cols)):
+    #     end_game("DRAW! All counters removed.")
+    #     return
+
+    # Switch turn
+    # turn = 1 - turn
+    # status_label.config(text=f"Turn: Player {turn+1}")
+
+    # # Automatic agent move if next turn is agent
+    # if player_types[turn] == 1:
+    #     root.after(500, agent_move)
+# ---------------------------
+# Agent logic
+# # ---------------------------
+# agent = Agent((state.rows, state.cols), "Echo")
+
+# def agent_move():
+#     global turn
+#     # Agent uses minimax
+#     _, move = agent.move(state, 'minimax')
+#     if move:
+#         on_click(*move)
+
+
+# def get_player_types():
+#     mode = mode_var.get()
+#     if mode == "Human vs Human":
+#         return [0, 0]
+#     elif mode == "Human vs Agent":
+#         return [0, 1]
+#     elif mode == "Agent vs Agent":
+#         return [1, 1]
+
+
+
+# ---------------------------
+# Start Game Button
+# ---------------------------
+# def start_game():
+#     global player_types, turn, move_count
+#     player_types = get_player_types()
+#     turn = 0
+#     move_count = 0
+
+#     # Reset board display
+#     for r in range(state.rows):
+#         for c in range(state.cols):
+#             buttons[r][c].config(
+#                 text=str(state.grid[r][c]),
+#                 bg=CELL_BG,
+#                 state="normal"
+#             )
+#     status_label.config(text=f"Turn: Player {turn+1}")
+#     moves_label.config(text=f"Moves: {move_count}")
+#     history_box.delete(0, tk.END)
+
+#     # If first turn is agent, start automatic move
+#     if player_types[turn] == 1:
+#         root.after(500, agent_move)
+
+# tk.Button(sidebar, text="Start Game", command=start_game, bg="#9DCFF5").pack(pady=10)
+
+
 root.configure(bg=BG)
 board_frame.configure(bg=BOARD_BG, relief="groove", bd=6)
 
-
+# def end_game(message):
+#     """End the game: disable all buttons and show message"""
+#     for row in buttons:
+#         for btn in row:
+#             btn.config(state="disabled")
+#     status_label.config(text=message)
 
 
 for r in range(state.rows):
