@@ -5,21 +5,46 @@ Student ID:
 
 """
 """
-State class for the Hinger game
+Agent class for the Hinger game
 """
 
 from a1_state import State
 import timeit
 
 class Agent:
+    """
+    a. Initialiser, which receives two parameters: size and name. The first
+    parameter size represents the board size as a tuple (m,n), where m is the
+    number of rows and n is the number of columns. The second parameter
+    name is an optional string representing the agent’s name, with your group
+    name as the default value. The initialiser should set up the agent accordingly.
+    """ 
     def __init__(self, size, name='B1'):
         self.size = size
         self.name = name
         self.modes = ['minimax', 'alphabeta']
 
+    """
+    b. A sensible __str__ method.
+    """
     def __str__(self):
         return f"Agent name: {self.name}, Board size: {self.size} Modes: {self.modes}"
     
+    """
+    c. Method move(state, mode) that receives a State object representing the
+    current game board and a playing strategy, and returns a legitimate move for your agent (e.g. a cell position (𝑖, 𝑗) to act on). 
+    If no move is possible (e.g.there are no active cells), return None. Use the best strategy you have
+    implemented as the default value for the mode parameter.
+    """
+    def move(self, state, mode):
+        print(f"Agent {self.name} using {mode.upper()} strategy...")
+        if mode == "minimax":
+            return self.minimax_move(state)
+        if mode == "alphabeta":
+            return self.alphabeta_move(state)
+        else:
+            raise ValueError(f"Unknown mode: {mode}") 
+        
 
     def win(self, state):
         return state.numHingers() > 0
@@ -67,14 +92,7 @@ class Agent:
     
     
 
-    def move(self, state, mode):
-        print(f"Agent {self.name} using {mode.upper()} strategy...")
-        if mode == "minimax":
-            return self.minimax_move(state)
-        if mode == "alphabeta":
-            return self.alphabeta_move(state)
-        else:
-            raise ValueError(f"Unknown mode: {mode}") 
+   
        
           
         
