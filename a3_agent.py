@@ -16,16 +16,16 @@ class Agent:
         return f"Agent name: {self.name}, Board size: {self.size} Modes: {self.modes}"
     
 
-    # def win(self, state):
-    #     return state.numHingers() == 1
+    def win(self, state):
+        return state.numHingers() > 0
     
     
     def is_terminal(self, state):
     
-        #need section for checking if there is a win
-        # if self.win(state):
-        #     print("this state is a winner state ")
-        #     return True
+        # need section for checking if there is a win
+        if self.win(state):
+            print("this state is a winner state ")
+            return True
         
         for rows in state.grid:
             for cell in rows:
@@ -174,14 +174,14 @@ def tester():
 
 
 
-    # sa_grid3 = [
-    #         [1, 1, 0, 0, 1],
-    #         [1, 1, 0, 0, 0],
-    #         [0, 0, 1, 1, 1],
-    #         [0, 0, 0, 1, 1]
-    # ]
-    # state2 = State(sa_grid3)
-    # print("Is terminal?",agent.is_terminal(state2))
+    sa_grid3 = [
+            [1, 1, 0, 0, 1],
+            [1, 1, 0, 0, 0],
+            [0, 0, 1, 1, 1],
+            [0, 0, 0, 1, 1]
+    ]
+    state2 = State(sa_grid3)
+    print("Is terminal?",agent.is_terminal(state2))
 
 
     #best_move = agent.minimax_move(sa)

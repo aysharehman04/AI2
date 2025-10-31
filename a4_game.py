@@ -1,7 +1,4 @@
-from a1_state import State
-from a3_agent import Agent
 
-# a4_game
 """
 Hinger Game Core Gameplay Module
 """
@@ -9,6 +6,9 @@ Hinger Game Core Gameplay Module
 import time
 from a1_state import State
 from a3_agent import Agent
+
+# def play(state, agentA, agentB):
+
 
 def play(state, agentA=None, agentB=None, default_mode="alphabeta", turn_time_limit=None):
     """
@@ -107,17 +107,17 @@ def tester():
     ]
     state = State(initial_grid)
 
-    # # Create two AI agents
-    # agentA = Agent(size=(4,4), name="AgentA")
-    # agentB = Agent(size=(4,4), name="AgentB")
+    # Create two AI agents
+    agentA = Agent(size=(4,4), name="AgentA")
+    agentB = Agent(size=(4,4), name="AgentB")
 
-    # print("Starting Hinger game between AgentA and AgentB...")
-    # winner = play(state, agentA, agentB, default_mode="alphabeta", turn_time_limit=10)
+    print("Starting Hinger game between AgentA and AgentB...")
+    winner = play(state, agentA, agentB, default_mode="alphabeta", turn_time_limit=10)
 
-    # if winner is None:
-    #     print("Game ended in a draw.")
-    # else:
-    #     print(f"The winner is: {winner}")
+    if winner is None:
+        print("Game ended in a draw.")
+    else:
+        print(f"The winner is: {winner}")
     agentA = None
     agentB = Agent(size=(4,4), name="AgentD")
     winner = play(state, agentA, agentB, default_mode="alphabeta", turn_time_limit=10)
