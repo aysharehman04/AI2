@@ -32,12 +32,12 @@ def StatesEqual(s1, s2):
 
 
 def IsSafe(state):
-    """Return True if a state is safe (no hingers)."""
+    """Return True if a state is safe (state has no hingers)."""
     return state.numHingers() == 0
 
 
 def ApplyMoves(start, moves):
-    """Apply a sequence of moves to get the final state."""
+    """Apply a sequence of moves to get to the final state."""
     Current = start
     for move in moves:
         r, c = move
@@ -54,7 +54,7 @@ def MoveCost(state, move):
 
 
 def PathCost(start, moves):
-    """Compute total cost of a path."""
+    """Finds out the total cost of a path."""
     Total = 0
     Current = start
     for move in moves:
@@ -307,7 +307,6 @@ def min_safe(start, end):
 # Compare algorithms
 # =====================================================
 def compare(start, end):
-    """Compare all search algorithms."""
     print("\nComparing search algorithms:\n")
     Algos = [
         ("BFS", path_BFS),
@@ -330,8 +329,7 @@ def compare(start, end):
 # Tester
 # =====================================================
 def tester():
-    """Test the search functions."""
-    print("=== a2_path.py tester ===")
+    print("--- a2_path.py tester ---")
 
     # Test 1: trivial case
     print("\nTest 1: Empty board (start == end)")
@@ -390,7 +388,7 @@ def tester():
     compare(start, end)
 
     # Test 8: Showing and comparing steps for each algorithm
-    print("\n=== Search Algorithm Comparisons ===")
+    print("\n--- Search Algorithm Comparisons ---")
     start = State([[1, 1, 0], [1, 1, 0], [0, 0, 0], [1,2, 1]])
     end = State([[1, 1, 0], [1, 0, 0], [0, 0, 0], [1,0, 0]])
 
@@ -403,7 +401,7 @@ def tester():
     }
 
     for name, func in searchAlgorithms.items():
-        print(f"\n=== {name} Example showing moves ===")
+        print(f"\n--- {name} Testing Example showing moves ---")
         Moves = func(start, end)
 
         if Moves:

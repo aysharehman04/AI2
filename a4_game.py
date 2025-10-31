@@ -144,8 +144,7 @@ def IsHinger(state, r, c):
 
 
 def tester():
-    """Test the game implementation."""
-    print("=== a4_game.py tester ===\n")
+    print("--- a4_game.py tester ---\n")
 
     # Test 1: agent vs agent
     print("Test 1: Agent vs Agent")
@@ -162,7 +161,7 @@ def tester():
     print(f"\nResult: {Winner if Winner else 'Draw'}\n")
 
     # Test 2: smaller game
-    print("\n" + "=" * 50)
+    print("\n" + "-" * 50)
     print("Test 2: Smaller board")
     TestGrid2 = [
         [1, 1],
@@ -176,7 +175,7 @@ def tester():
     print(f"\nResult: {Winner2 if Winner2 else 'Draw'}\n")
 
     # Test 3: example with potential hinger
-    print("\n" + "=" * 50)
+    print("\n" + "-" * 50)
     print("Test 3: Board with hinger")
     TestGrid3 = [
         [1, 0, 1],
