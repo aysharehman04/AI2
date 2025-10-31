@@ -44,7 +44,6 @@ def play(state, agentA, agentB):
         print(CurrentState)
         print()
 
-        # check if board is empty (draw)
         IsEmpty = True
         for r in range(CurrentState.rows):
             for c in range(CurrentState.cols):
@@ -58,15 +57,11 @@ def play(state, agentA, agentB):
             print("All counters removed - DRAW!")
             return None
 
-        # get move
         if CurrentPlayer is None:
-            # human player
             Move = GetHumanMove(CurrentState)
         else:
-            # agent player
             Move = GetAgentMove(CurrentPlayer, CurrentState)
 
-        # validate move
         if Move is None:
             print(f"Invalid move by {CurrentName}!")
             OpponentName = PlayerNames[1 - Turn]
@@ -80,10 +75,8 @@ def play(state, agentA, agentB):
             print(f"{OpponentName} wins!")
             return OpponentName
 
-        # check if move is on a hinger
         WasHinger = IsHinger(CurrentState, r, c)
 
-        # apply move
         NewGrid = [row[:] for row in CurrentState.grid]
         NewGrid[r][c] -= 1
         CurrentState = State(NewGrid)
@@ -91,14 +84,12 @@ def play(state, agentA, agentB):
         print(f"{CurrentName} moves at {Move}")
         MoveCount += 1
 
-        # check win condition
         if WasHinger:
             print("\nFinal board:")
             print(CurrentState)
             print(f"\n{CurrentName} hit a HINGER and WINS!")
             return CurrentName
 
-        # switch turns
         Turn = 1 - Turn
 
 
@@ -120,7 +111,6 @@ def GetHumanMove(state):
 def GetAgentMove(agent, state):
     """Get move from agent using its default strategy."""
     try:
-        # use first available mode
         Mode = agent.modes[0] if agent.modes else 'minimax'
         Score, Move = agent.move(state, Mode)
         return Move
@@ -130,10 +120,8 @@ def GetAgentMove(agent, state):
 
 def IsValidMove(state, r, c):
     """Check if a move is valid."""
-    # check bounds
     if r < 0 or r >= state.rows or c < 0 or c >= state.cols:
         return False
-    # check if cell has counters
     if state.grid[r][c] <= 0:
         return False
     return True
@@ -147,13 +135,11 @@ def IsHinger(state, r, c):
 
     OriginalRegions = state.numRegions()
 
-    # simulate removing the counter
     TestGrid = [row[:] for row in state.grid]
     TestGrid[r][c] = 0
     TestState = State(TestGrid)
     NewRegions = TestState.numRegions()
 
-    # hinger if regions increase
     return NewRegions > OriginalRegions
 
 
@@ -204,6 +190,9 @@ def tester():
 
     Winner3 = play(TestState3, AgentE, AgentF)
     print(f"\nResult: {Winner3 if Winner3 else 'Draw'}\n")
+
+    Winner = play(TestState, None, AgentB)  # Human vs Agent
+    Winner = play(TestState, None, None)  # Human vs Human
 
 
 if __name__ == "__main__":
