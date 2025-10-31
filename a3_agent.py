@@ -1,8 +1,13 @@
 """
-Agent class for the Hinger Game
-
+Group ID: B1
+Student ID: 
+100464246
 
 """
+"""
+State class for the Hinger game
+"""
+
 from a1_state import State
 import timeit
 

@@ -2,7 +2,8 @@
 """
 Group ID: B1
 Student IDs:
-@author: 100464246
+100464246
+
 
 
 """

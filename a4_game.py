@@ -1,11 +1,11 @@
 # a4_game.py
 """
 Group ID: B1
-Student ID: 100464246
-
-Task 4 – Hinger Game Implementation
-
-This module implements the core gameplay loop for the Hinger game.
+Student ID: 
+100464246
+"""
+"""
+State class for the Hinger game
 """
 
 from a1_state import State

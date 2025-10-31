@@ -1,9 +1,15 @@
 # a2_path.py
 """
 Group ID: B1
-Student ID: 100464246
+Student ID: 
+100464246
 
-Task 2 – Safe Path Search for the Hinger Game
+
+"""
+"""
+Contains a set of functions for determining and retrieving safe paths
+between states in the Hinger game, along with a test harness to validate and
+compare implementations.
 
 This module implements the following algorithms:
   - path_BFS
@@ -11,28 +17,29 @@ This module implements the following algorithms:
   - path_IDDFS
   - path_astar
   - min_safe
-  - compare()
-  - tester()
 """
 
 from a1_state import State
-
-
-# =====================================================
-# Helper functions
-# =====================================================
+"""
+Helper functions
+"""
 def GridToKey(grid):
-    """Turn a grid into a tuple so it can be hashed/compared."""
+    """
+    Converts a 2D grid into a tuple of tuples so it can be hashed/compared.
+    Useful for storing visited states in sets/dictionaries.
+    """
     return tuple(tuple(row) for row in grid)
 
 
 def StatesEqual(s1, s2):
-    """Return True if two states have identical grids."""
+    """Returns True if two states have identical grids, if so that goal state
+    has been reached.
+    """
     return s1.grid == s2.grid
 
 
 def IsSafe(state):
-    """Return True if a state is safe (state has no hingers)."""
+    """Returns True if a state is safe (state has no hingers)."""
     return state.numHingers() == 0
 
 
@@ -48,7 +55,10 @@ def ApplyMoves(start, moves):
 
 
 def MoveCost(state, move):
-    """Get the cost of a move at position (r, c)."""
+    """
+    Get the cost of a move at a specific cell (r, c).
+    Used in PathCost and min_safe for calculating total path costs.
+    """
     r, c = move
     return state.move_cost(r, c)
 
@@ -65,12 +75,18 @@ def PathCost(start, moves):
         Current = State(NewGrid)
     return Total
 
+"""
+a. A function path_BFS(start,end) that receives two binary states, start and end,
+and returns a safe path (as a list of moves) if such a path exists, or None
+otherwise, using the Breadth-First Search (BFS) algorithm.
 
-# =====================================================
-# Breadth-First Search
-# =====================================================
+Justification for BFS:
+Uses a queue to explore all possible paths level by level.
+BFS guarantees finding a path if one exists.
+BFS finds the shortest path.
+Simple to implement and understand.
+"""
 def path_BFS(start, end):
-    """BFS to find a safe path."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
@@ -94,12 +110,17 @@ def path_BFS(start, end):
             Frontier.append((NextState, NewMoves))
     return None
 
+"""
+b. A function path_DFS(start, end) which receives two binary states, start and
+end, and returns a safe path (as a list of moves) if such a path exists, or None
+otherwise, using the Depth-First Search (DFS) algorithm.
 
-# =====================================================
-# Depth-First Search
-# =====================================================
+Justification for DFS:
+Uses a stack to explore as deep as possible along each path before backtracking.
+DFS can be more memory efficient than BFS for deep search spaces.
+DFS can find a path quickly in some scenarios, though not guaranteed to be shortest.
+"""
 def path_DFS(start, end, limit=10000):
-    """DFS using a stack."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
@@ -128,11 +149,8 @@ def path_DFS(start, end, limit=10000):
     return None
 
 
-# =====================================================
-# Iterative Deepening DFS
-# =====================================================
 def limited_dfs(Current, end, depth, Visited, Moves):
-    """Helper for depth-limited search."""
+    """Building block for IDDFS, allows IDDFS to explore shallower depths first."""
     if StatesEqual(Current, end):
         return Moves
     if depth == 0:
@@ -148,9 +166,17 @@ def limited_dfs(Current, end, depth, Visited, Moves):
             return Result
     return None
 
+"""
+c. A function path_
+IDDFS(start, end) which receives two binary states, start and
+end, and returns a safe path (as a list of moves) if such a path exists, or None
+otherwise, using the Iterative Deepening Depth-First Search (IDDFS).
 
+Justification for IDDFS:
+Combines benefits of BFS (completeness) and DFS (space efficiency).
+Explores shallower depths first, which can find solutions quickly in some cases.
+"""
 def path_IDDFS(start, end, MaxDepth=50):
-    """Iterative deepening DFS."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
@@ -164,15 +190,13 @@ def path_IDDFS(start, end, MaxDepth=50):
     return None
 
 
-# =====================================================
-# A* Search (Manhattan heuristic)
-# =====================================================
+"""
+Manhattan heuristic for A* search
+
+Justification for Manhattan Heuristic:
+Provides a reasonable estimate of distance.
+"""
 def manhattan_heuristic(start, end):
-    """
-    Heuristic for A*.
-    Pairs up active cells and calculates Manhattan distance between them.
-    Admissible because it never overestimates the actual cost.
-    """
     S1 = []
     S2 = []
     for r in range(start.rows):
@@ -195,9 +219,18 @@ def manhattan_heuristic(start, end):
     Total += abs(len(S1) - len(S2))
     return Total
 
+"""
+d. A function path_astar(start,end) which receives two binary states, start and
+end, and returns a safe path if one exists, or None otherwise, using the A*
+search algorithm.
 
+Justification for A* Search:
+A* is efficient and finds optimal paths using heuristics.
+Explores paths with the lowest estimated total cost first.
+Faster on larger boards.
+Combines benefits of uniform cost search (optimality) with heuristics (speed).
+"""
 def path_astar(start, end):
-    """A* search with Manhattan heuristic."""
     if not IsSafe(start) or not IsSafe(end):
         return None
     if StatesEqual(start, end):
@@ -250,19 +283,19 @@ def path_astar(start, end):
                     OpenList.append(NextState)
     return None
 
+"""
+g. [*] A function min_safe(start,end) which receives two states start and end
+(which are not necessary binary), and returns a safe path with the minimal
+cost (i.e., the safe path with the lowest total sum of move costs) if such a
+path exists. Otherwise, it should return None.
 
-# =====================================================
-# Minimum Cost Safe Path (starred task)
-# =====================================================
+Justification for Uniform Cost Search:
+Expands lowest cost path first.
+Doesn't need a heuristic like A* (hard to make one for non-binary states).
+Works for any number of counters per cell.
+"""
+
 def min_safe(start, end):
-    """
-    Find minimum cost path using Uniform Cost Search.
-
-    Chose UCS because:
-    - Guarantees optimal (lowest cost) path
-    - Don't need a heuristic like A* (hard to make one for non-binary states)
-    - Works for any number of counters per cell
-    """
     if not IsSafe(start) or not IsSafe(end):
         return None
 
@@ -302,10 +335,12 @@ def min_safe(start, end):
 
     return None
 
-
-# =====================================================
-# Compare algorithms
-# =====================================================
+"""
+f. A test function named tester() to test the functions you implemented.
+Function compare() to evaluate and compare the performance of the
+four search algorithms (BFS,DFS, IDDFS, and A*) in finding a safe path
+between two game states in Hinger.
+"""
 def compare(start, end):
     print("\nComparing search algorithms:\n")
     Algos = [
@@ -325,9 +360,9 @@ def compare(start, end):
             print(f"{name:8} | Failed to find a path.")
 
 
-# =====================================================
-# Tester
-# =====================================================
+"""
+Tester 
+"""
 def tester():
     print("--- a2_path.py tester ---")
 
