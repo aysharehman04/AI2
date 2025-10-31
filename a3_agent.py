@@ -2,6 +2,9 @@
 Group ID: B1
 Student ID: 
 100464246
+100428936
+
+
 
 """
 """
@@ -158,35 +161,35 @@ def tester():
     print("Agent tester:")
 
     agent = Agent((5,4))
-    # print(agent)
-    # sa_grid2 = [
-    #         [1, 1, 0, 0, 2],
-    #         [1, 1, 0, 0, 0],
-    #         [0, 0, 1, 1, 1],
-    #         [0, 0, 0, 1, 1]
-    # ]
-    # state = State(sa_grid2)
-    # print("Is terminal?",agent.is_terminal(state))
-    # print("\n")
+    print(agent)
+    sa_grid2 = [
+            [1, 1, 0, 0, 2],
+            [1, 1, 0, 0, 0],
+            [0, 0, 1, 1, 1],
+            [0, 0, 0, 1, 1]
+    ]
+    state = State(sa_grid2)
+    print("Is terminal?",agent.is_terminal(state))
+    print("\n")
 
 
-    # print("Testing Minimax:")
-    # def run_minimax():
-    #     score, move = agent.minimax_move(state)
-    #     # print(score, move)
-    #     print("\n")
+    print("Testing Minimax:")
+    def run_minimax():
+        score, move = agent.minimax_move(state)
+        # print(score, move)
+        print("\n")
 
-    # avg_time = timeit.timeit(run_minimax, number=10) / 10
-    # print(f"Average Minimax time over 10 runs: {avg_time:.6f} seconds")
+    avg_time = timeit.timeit(run_minimax, number=10) / 10
+    print(f"Average Minimax time over 10 runs: {avg_time:.6f} seconds")
 
-    # print("Testing Alphabeta:")
-    # def run_alphabeta():
-    #     score, move = agent.alphabeta_move(state)
-    #     # print(score, move)
-    #     print("\n")
+    print("Testing Alphabeta:")
+    def run_alphabeta():
+        score, move = agent.alphabeta_move(state)
+        # print(score, move)
+        print("\n")
 
-    # avg_time = timeit.timeit(run_alphabeta, number=10) / 10
-    # print(f"Average alphabeta time over 10 runs: {avg_time:.6f} seconds")
+    avg_time = timeit.timeit(run_alphabeta, number=10) / 10
+    print(f"Average alphabeta time over 10 runs: {avg_time:.6f} seconds")
 
 
 
