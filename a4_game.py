@@ -4,11 +4,6 @@ Group ID: B1
 Student ID: 
 100464246
 100428936
-
-
-"""
-"""
-State class for the Hinger game
 100435561
 """
 

@@ -4,17 +4,12 @@ Group ID: B1
 Student ID:
 100464246
 100428936
-
-
-
-
 100435561
 """
 """
 State class for the Hinger game
 
 """
-from copy import deepcopy
 class State:
     def __init__(self, grid):
         """
@@ -131,13 +126,6 @@ class State:
         return cost
     
     def clone(self):
-        """
-        f. Any additional utility methods that support gameplay logic or improve code
-        clarity.
-        Returns a deepcopy of the state.
-        Used from Taoyangs code from lab1 part 2
-        https://docs.python.org/3.12/library/copy.html
-        """
         return State([row[:] for row in self.grid])
         # """Return a deep copy of the state."""
         # return deepcopy(self)
@@ -145,13 +133,7 @@ class State:
     
 def tester():
         """
-        Within this file, define a test function named tester() to validate your
-        implementation. This function should execute automatically when the script
-        a1_state.py is run directly, but not when imported as a module. Inside this
-        function, implement the following tasks:
-        i. Create a State instance named sa representing State A from Figure 1,
-        and print its string representation.
-        ii. Implement additional testing cases to verify your implementation. 
+        Tester to test states
         """
         print("Hinger state tester:")
 
